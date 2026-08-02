@@ -23,16 +23,28 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Install MAUI iOS Workload
+    - name: Install MAUI Workloads
       run: |
-        sudo dotnet workload install maui-ios --source https://api.nuget.org/v3/index.json
+        sudo dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-    - name: Build & Publish iOS App
+    - name: Build iOS App Bundle
       run: |
-        dotnet publish "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:TargetFrameworks=net9.0-ios -p:BuildIpa=true -p:EnableCodeSigning=false
+        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:SingleTarget=true -p:EnableCodeSigning=false -p:ValidateXcodeVersion=false -p:_ValidateXcodeVersion=false
+
+    - name: Package IPA for Sideloadly
+      run: |
+        cd "Air Quality/bin/Release/net9.0-ios"
+        APP_DIR=$(find . -name "Air_Quality.app" -type d | head -n 1)
+        if [ -n "$APP_DIR" ]; then
+          mkdir -p Payload
+          cp -r "$APP_DIR" Payload/
+          zip -r Air_Quality.ipa Payload
+        fi
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Air_Quality_iOS_App
-        path: Air Quality/bin/Release/net9.0-ios/**
+        path: |
+          Air Quality/bin/Release/net9.0-ios/*.ipa
+          Air Quality/bin/Release/net9.0-ios/**
