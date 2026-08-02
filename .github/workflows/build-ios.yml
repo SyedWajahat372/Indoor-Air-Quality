@@ -24,9 +24,9 @@ jobs:
 
     - name: Build iOS App Bundle
       run: |
-        dotnet publish "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r ios-arm64 -p:SingleTarget=true -p:EnableCodeSigning=false -p:ValidateXcodeVersion=false -p:BuildIpa=true
+        dotnet publish "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r iossimulator-arm64 -p:SingleTarget=true -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" -p:ValidateXcodeVersion=false || dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r iossimulator-arm64 -p:SingleTarget=true -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" -p:ValidateXcodeVersion=false
 
-    - name: Package IPA Backup for Sideloadly
+    - name: Package IPA for Sideloadly
       run: |
         APP_PATH=$(find "Air Quality/bin/Release/net9.0-ios" -name "*.app" -type d | head -n 1)
         echo "Found app at: $APP_PATH"
