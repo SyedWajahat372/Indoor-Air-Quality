@@ -13,6 +13,10 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: Remove Preview SDK Packs
+      run: |
+        sudo rm -rf ~/.dotnet/sdk/10.* ~/.dotnet/packs/Microsoft.iOS.Sdk.net9.0_26.* /usr/local/share/dotnet/sdk/10.* || true
+
     - name: Select Xcode 16.1
       run: |
         sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
@@ -21,15 +25,15 @@ jobs:
     - name: Setup .NET 9.0 (Stable SDK)
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.200'
+        dotnet-version: '9.0.100'
 
-    - name: Install Complete MAUI Workload
+    - name: Install Stable MAUI Workload
       run: |
-        sudo dotnet workload install maui --source https://api.nuget.org/v3/index.json
+        sudo dotnet workload install maui-ios maui-android maui-maccatalyst --source https://api.nuget.org/v3/index.json
 
     - name: Build iOS App
       run: |
-        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:SingleTarget=true -p:EnableCodeSigning=false -p:IosSdkVersion=18.0
+        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:SingleTarget=true -p:EnableCodeSigning=false -p:SdkIsPreview=false
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
