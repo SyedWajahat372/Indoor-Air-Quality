@@ -24,7 +24,7 @@ jobs:
 
     - name: Build iOS App Bundle
       run: |
-        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:SingleTarget=true -p:EnableCodeSigning=false
+        dotnet publish "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r ios-arm64 -p:SingleTarget=true -p:ArchiveOnBuild=true -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision=""
 
     - name: Package IPA for Sideloadly
       run: |
@@ -42,4 +42,4 @@ jobs:
         name: Air_Quality_iOS_App
         path: |
           Air Quality/bin/Release/net9.0-ios/**/*.ipa
-          Air Quality/bin/Release/net9.0-ios/**/*.app
+          Air Quality/bin/Release/net9.0-ios/**/*.xcarchive
