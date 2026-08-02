@@ -23,9 +23,9 @@ jobs:
       with:
         dotnet-version: '9.0.200'
 
-    - name: Install All MAUI Workloads
+    - name: Install Complete MAUI Workload
       run: |
-        sudo dotnet workload install maui-ios maui-android --source https://api.nuget.org/v3/index.json
+        sudo dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
     - name: Build iOS App
       run: |
