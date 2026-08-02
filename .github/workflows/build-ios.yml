@@ -18,9 +18,9 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Install MAUI iOS Workload
+    - name: Restore MAUI Workloads
       run: |
-        sudo dotnet workload install maui-ios --source https://api.nuget.org/v3/index.json
+        sudo dotnet workload restore "Air Quality/Air_Quality.csproj" --source https://api.nuget.org/v3/index.json
 
     - name: Build iOS App
       run: |
