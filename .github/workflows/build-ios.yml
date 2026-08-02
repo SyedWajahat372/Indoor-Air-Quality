@@ -13,6 +13,18 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: Select Xcode 16 Version
+      run: |
+        DEVELOPER_DIR="/Applications/Xcode_16.0.app/Contents/Developer"
+        if [ ! -d "$DEVELOPER_DIR" ]; then
+          DEVELOPER_DIR="/Applications/Xcode_16.1.app/Contents/Developer"
+        fi
+        if [ ! -d "$DEVELOPER_DIR" ]; then
+          DEVELOPER_DIR="/Applications/Xcode_16.app/Contents/Developer"
+        fi
+        sudo xcode-select -s "$DEVELOPER_DIR" || true
+        xcodebuild -version
+
     - name: Setup .NET 9.0
       uses: actions/setup-dotnet@v4
       with:
@@ -24,7 +36,7 @@ jobs:
 
     - name: Build iOS App
       run: |
-        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release
+        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:EnableCodeSigning=false
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
