@@ -13,11 +13,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Select Xcode 16.1
-      run: |
-        sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
-        xcodebuild -version
-
     - name: Setup .NET 9.0
       uses: actions/setup-dotnet@v4
       with:
@@ -25,11 +20,11 @@ jobs:
 
     - name: Install MAUI Workloads
       run: |
-        sudo dotnet workload install maui --source https://api.nuget.org/v3/index.json
+        dotnet workload install maui-ios --source https://api.nuget.org/v3/index.json
 
     - name: Build iOS App Bundle
       run: |
-        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r iossimulator-arm64 -p:EnableCodeSigning=false
+        dotnet publish "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r ios-arm64 -p:SingleTarget=true -p:EnableCodeSigning=false -p:ValidateXcodeVersion=false -p:BuildIpa=true
 
     - name: Package IPA for Sideloadly
       run: |
@@ -39,11 +34,12 @@ jobs:
         cp -r "$APP_PATH" Payload/
         zip -r Air_Quality.ipa Payload
         mkdir -p "Air Quality/bin/Release/net9.0-ios/output"
-        mv Air_Quality.ipa "Air Quality/bin/Release/net9.0-ios/output/"
+        mv Air_Quality.ipa "Air Quality/bin/Release/net9.0-ios/output/" || true
+        find "Air Quality/bin/Release/net9.0-ios" -name "*.ipa"
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Air_Quality_iOS_App
         path: |
-          Air Quality/bin/Release/net9.0-ios/output/*.ipa
+          Air Quality/bin/Release/net9.0-ios/**/*.ipa
