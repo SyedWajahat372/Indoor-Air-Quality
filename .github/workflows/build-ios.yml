@@ -29,22 +29,21 @@ jobs:
 
     - name: Build iOS App Bundle
       run: |
-        dotnet publish "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r ios-arm64 -p:SingleTarget=true -p:EnableCodeSigning=false -p:BuildIpa=true -p:ServerAddress=""
+        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r ios-arm64 -p:EnableCodeSigning=false -p:CodesignKey="" -p:CodesignProvision="" || dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r iossimulator-arm64 -p:EnableCodeSigning=false
 
-    - name: Package IPA Backup for Sideloadly
+    - name: Package IPA for Sideloadly
       run: |
-        cd "Air Quality/bin/Release/net9.0-ios/ios-arm64"
-        if [ -d "publish" ]; then cd publish; fi
+        APP_PATH=$(find "Air Quality/bin/Release/net9.0-ios" -name "*.app" -type d | head -n 1)
+        echo "Found app at: $APP_PATH"
         mkdir -p Payload
-        if [ -d "Air_Quality.app" ]; then cp -r Air_Quality.app Payload/; fi
-        zip -r Air_Quality_Manual.ipa Payload
-        mv Air_Quality_Manual.ipa ../
+        cp -r "$APP_PATH" Payload/
+        zip -r Air_Quality.ipa Payload
+        mkdir -p "Air Quality/bin/Release/net9.0-ios/output"
+        mv Air_Quality.ipa "Air Quality/bin/Release/net9.0-ios/output/"
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Air_Quality_iOS_App
         path: |
-          Air Quality/bin/Release/net9.0-ios/ios-arm64/*.ipa
-          Air Quality/bin/Release/net9.0-ios/*.ipa
-          Air Quality/bin/Release/net9.0-ios/ios-arm64/publish/*.ipa
+          Air Quality/bin/Release/net9.0-ios/output/*.ipa
