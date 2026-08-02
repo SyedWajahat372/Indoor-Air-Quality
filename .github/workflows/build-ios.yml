@@ -23,16 +23,16 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Install MAUI Workloads
+    - name: Install MAUI iOS Workload
       run: |
-        sudo dotnet workload install maui --source https://api.nuget.org/v3/index.json
+        sudo dotnet workload install maui-ios --source https://api.nuget.org/v3/index.json
 
-    - name: Build iOS App
+    - name: Build & Publish iOS App
       run: |
-        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:SingleTarget=true -p:EnableCodeSigning=false -p:ValidateXcodeVersion=false -p:_ValidateXcodeVersion=false -p:MtouchLink=None
+        dotnet publish "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:TargetFrameworks=net9.0-ios -p:BuildIpa=true -p:EnableCodeSigning=false
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Air_Quality_iOS_Build
+        name: Air_Quality_iOS_App
         path: Air Quality/bin/Release/net9.0-ios/**
