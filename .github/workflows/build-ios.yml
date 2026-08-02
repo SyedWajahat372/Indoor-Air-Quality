@@ -29,17 +29,15 @@ jobs:
 
     - name: Build iOS App Bundle
       run: |
-        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:SingleTarget=true -p:EnableCodeSigning=false -p:ValidateXcodeVersion=false -p:_ValidateXcodeVersion=false
+        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -r iossimulator-arm64 -p:SingleTarget=true
 
     - name: Package IPA for Sideloadly
       run: |
-        cd "Air Quality/bin/Release/net9.0-ios"
-        APP_DIR=$(find . -name "Air_Quality.app" -type d | head -n 1)
-        if [ -n "$APP_DIR" ]; then
-          mkdir -p Payload
-          cp -r "$APP_DIR" Payload/
-          zip -r Air_Quality.ipa Payload
-        fi
+        cd "Air Quality/bin/Release/net9.0-ios/iossimulator-arm64"
+        mkdir -p Payload
+        cp -r Air_Quality.app Payload/
+        zip -r Air_Quality.ipa Payload
+        mv Air_Quality.ipa ../
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
