@@ -13,30 +13,23 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Select Xcode 16 Version
+    - name: Select Xcode 16.1
       run: |
-        DEVELOPER_DIR="/Applications/Xcode_16.0.app/Contents/Developer"
-        if [ ! -d "$DEVELOPER_DIR" ]; then
-          DEVELOPER_DIR="/Applications/Xcode_16.1.app/Contents/Developer"
-        fi
-        if [ ! -d "$DEVELOPER_DIR" ]; then
-          DEVELOPER_DIR="/Applications/Xcode_16.app/Contents/Developer"
-        fi
-        sudo xcode-select -s "$DEVELOPER_DIR" || true
+        sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
         xcodebuild -version
 
-    - name: Setup .NET 9.0
+    - name: Setup .NET 9.0 (Stable SDK)
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '9.0.200'
 
-    - name: Restore MAUI Workloads
+    - name: Install MAUI Workload
       run: |
-        sudo dotnet workload restore "Air Quality/Air_Quality.csproj" --source https://api.nuget.org/v3/index.json
+        dotnet workload install maui-ios --source https://api.nuget.org/v3/index.json
 
     - name: Build iOS App
       run: |
-        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:EnableCodeSigning=false
+        dotnet build "Air Quality/Air_Quality.csproj" -f net9.0-ios -c Release -p:EnableCodeSigning=false -p:IosSdkVersion=18.0 -p:MtouchExtraArgs="--sdkroot /Applications/Xcode_16.1.app"
 
     - name: Upload iOS App Build Artifacts
       uses: actions/upload-artifact@v4
